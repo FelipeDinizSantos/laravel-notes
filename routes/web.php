@@ -11,4 +11,4 @@ Route::prefix('/login')->group(function () {
     Route::post('/', [AuthController::class, 'store']);
 });
 
-// Route::get('/logout', [AuthController::class, 'logout']);
+Route::get('/logout', [AuthController::class, 'logout']);

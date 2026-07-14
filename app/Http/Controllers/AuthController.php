@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -13,7 +15,9 @@ class AuthController extends Controller
 
     public function logout()
     {
-        // return view('logout');
+        session()->forget('user');
+
+        return redirect()->to('/login');
     }
 
     private function validateData(Request $request): void
@@ -37,8 +41,30 @@ class AuthController extends Controller
         $username = $request->input('text_username');
         $password = $request->input('text_password');
 
-        dd([
-            'success' => true
+        $user = User::query()
+            ->where('username', $username)
+            ->first();
+
+        if (
+            !$user ||
+            !password_verify($password, $user->password)
+        ) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('loginError', 'Username ou password incorretos.');
+        }
+
+        $user->last_login = now();
+        $user->save();
+
+        session([
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+            ]
         ]);
+
+        echo 'Login realizado com sucesso!';
     }
 }
