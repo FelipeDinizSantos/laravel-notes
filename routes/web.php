@@ -14,10 +14,10 @@ Route::middleware([CheckIsNotLogged::class])->group(function () {
 });
 
 Route::middleware([CheckIsLogged::class])->group(function () {
-    Route::get('/', [MainController::class, 'index']);
-    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::get('/', [MainController::class, 'index'])->name('home');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::prefix('notas')->group(function () {
-        Route::get('/criar', [MainController::class, 'createNote']);
+        Route::get('/criar', [MainController::class, 'createNote'])->name('new');
     });
 });
