@@ -15,6 +15,10 @@ class User extends Model
         'last_login',
     ];
 
+    public $hidden = [
+        'password',
+    ];
+
     public function notes(){
         return $this->hasMany(Note::class, 'user_id', 'id');
     }    

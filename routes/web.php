@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware([CheckIsNotLogged::class])->group(function () {
     Route::prefix('login')->group(function () {
-        Route::get('/', [AuthController::class, 'create']);
+        Route::get('/', [AuthController::class, 'create'])->name('login');
         Route::post('/', [AuthController::class, 'store']);
     });
 });
