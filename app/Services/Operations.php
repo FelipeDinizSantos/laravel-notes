@@ -14,7 +14,7 @@ class Operations
             return Crypt::decrypt($encryptId);
         } catch (DecryptException $error) {
             Log::info($error->getMessage());
-            return redirect()->route('home');
+            return null;
         }
     }
 }

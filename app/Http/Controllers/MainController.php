@@ -71,6 +71,10 @@ class MainController extends Controller
     {
         $note = Note::with('user')->findOrFail(Operations::decryptId($id));
 
+        if (!$note) {
+            return redirect()->route('home');
+        }
+
         return view('edit_note', [
             'note' => $note,
             'user' => $note->user
@@ -87,6 +91,10 @@ class MainController extends Controller
 
         $note = Note::findOrFail(Operations::decryptId($request->note_id));
 
+        if (!$note) {
+            return redirect()->route('home');
+        }
+
         $note->title = $request->text_title;
         $note->text = $request->text_note;
         $note->save();
@@ -97,6 +105,10 @@ class MainController extends Controller
     public function destroyNote(Request $req, string $id)
     {
         $note = Note::findOrFail(Operations::decryptId($id));
+
+        if (!$note) {
+            return redirect()->route('home');
+        }
 
         return view('delete_note', [
             'note' => $note,
