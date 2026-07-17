@@ -6,7 +6,6 @@ use App\Models\Note;
 use App\Models\User;
 use App\Services\Operations;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
 {
@@ -95,10 +94,25 @@ class MainController extends Controller
         return redirect()->route('home');
     }
 
-    public function destroyNote(Request $req, string $id): void
+    public function destroyNote(Request $req, string $id)
     {
         $note = Note::findOrFail(Operations::decryptId($id));
 
-        dd($note);
+        return view('delete_note', [
+            'note' => $note,
+            'user' => $this->user
+        ]);
+    }
+
+    public function deleteConfirm(string $id)
+    {
+        $note = Note::findOrFail(Operations::decryptId($id));
+
+        if (!$note) {
+            return redirect()->route('home');
+        }
+
+        $note->delete();
+        return redirect()->route('home');
     }
 }
