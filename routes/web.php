@@ -19,5 +19,11 @@ Route::middleware([CheckIsLogged::class])->group(function () {
 
     Route::prefix('notas')->group(function () {
         Route::get('/criar', [MainController::class, 'createNote'])->name('new');
+        Route::post('/', [MainController::class, 'storeNote'])->name('newNoteSubmit');
+
+        Route::get('/edit/{id}', [MainController::class, 'editNote'])->name('edit');
+        Route::post('/update', [MainController::class, 'updateNote'])->name('editNoteSubmit');
+
+        Route::get('/delete/{id}', [MainController::class, 'destroyNote'])->name('delete');
     });
 });

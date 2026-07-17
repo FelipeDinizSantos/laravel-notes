@@ -8,7 +8,7 @@
                 @include('top_bar')
 
                 <!-- notes are available -->
-                @if (empty($user->notes))
+                @if (count($user->notes) === 0)
                     <!-- no notes available -->
                     <div class="row mt-5">
                         <div class="col text-center">

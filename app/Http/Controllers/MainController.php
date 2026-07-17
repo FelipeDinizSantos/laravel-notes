@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Note;
 use App\Models\User;
+use App\Services\Operations;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
 {
@@ -11,18 +15,90 @@ class MainController extends Controller
     public function __construct()
     {
         $userId = session('user.id');
+
         $this->user = User::with('notes')->find($userId);
     }
 
     public function index()
     {
         return view('home', [
-           'user' => $this->user
+            'user' => $this->user
         ]);
     }
 
     public function createNote()
     {
-        echo 'Página para criação de uma nova nota!';
+        return view('new_note', [
+            'user' => $this->user
+        ]);
+    }
+
+    private function validateNoteData(Request $request)
+    {
+        $validated = $request->validate(
+            [
+                'text_title'           => 'required|min:3|max:200',
+                'text_note'            => 'required|min:3|max:3000',
+            ],
+            [
+                'text_title.required'  => 'O título é obrigatório!',
+                'text_title.min'       => 'O título deve ter pelo menos :min caracteres',
+                'text_title.max'       => 'O título deve ter no máximo :max caracteres',
+
+                'text_note.required'   => 'O texto é obrigatório',
+                'text_note.min'        => 'A nota deve ter pelo menos :min caracteres',
+                'text_note.max'        => 'A nota deve ter no máximo :max caracteres',
+            ]
+        );
+
+        return $validated;
+    }
+
+    public function storeNote(Request $request)
+    {
+        $this->validateNoteData($request);
+
+        $payload = [
+            'user_id' => $this->user->id,
+            'title'   => $request->text_title,
+            'text'    => $request->text_note
+        ];
+
+        Note::create($payload);
+        return redirect()->route('home');
+    }
+
+    public function editNote(string $id)
+    {
+        $note = Note::with('user')->findOrFail(Operations::decryptId($id));
+
+        return view('edit_note', [
+            'note' => $note,
+            'user' => $note->user
+        ]);
+    }
+
+    public function updateNote(Request $request)
+    {
+        $this->validateNoteData($request);
+
+        if (!$request->note_id) {
+            return redirect()->to('home');
+        }
+
+        $note = Note::findOrFail(Operations::decryptId($request->note_id));
+
+        $note->title = $request->text_title;
+        $note->text = $request->text_note;
+        $note->save();
+
+        return redirect()->route('home');
+    }
+
+    public function destroyNote(Request $req, string $id): void
+    {
+        $note = Note::findOrFail(Operations::decryptId($id));
+
+        dd($note);
     }
 }
